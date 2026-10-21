@@ -140,6 +140,13 @@
   font-weight: 600;
 }
 
+.version {
+  margin: 0.2rem 0 0;
+  color: var(--color-muted);
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+}
+
 .udp-chip {
   display: flex;
   flex-direction: column;

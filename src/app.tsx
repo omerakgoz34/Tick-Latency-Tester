@@ -18,6 +18,7 @@ import { MOVE_BYTES, BUSY_BYTES } from "./probe";
 import { TICK_HZ, ticksFor } from "./tick";
 
 const REGION_KEY = "tick-latency-region";
+const APP_VERSION = "v0.1.1";
 
 const MODES = [
   { id: "15", label: "15s", ms: 15_000 },
@@ -167,6 +168,7 @@ export function App() {
             <p class="brand-name">
               <b>TICK</b> LATENCY TESTER
             </p>
+            <p class="version">{APP_VERSION}</p>
           </div>
         </div>
         <div class="udp-chip">
