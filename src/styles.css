@@ -3,15 +3,6 @@
 @font-face {
   font-family: "Barlow Condensed";
   font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-400-normal.woff2")
-    format("woff2");
-}
-
-@font-face {
-  font-family: "Barlow Condensed";
-  font-style: normal;
   font-weight: 500;
   font-display: swap;
   src: url("../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-500-normal.woff2")
@@ -454,16 +445,20 @@
 
 .go {
   background: var(--color-red);
-  color: var(--color-paper);
+  color: var(--color-bg);
 }
 
 .go:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-red) 86%, white);
 }
 
-.go:disabled,
+.go:disabled {
+  background: #7a2a32;
+  color: var(--color-paper);
+}
+
 .stop:disabled {
-  opacity: 0.4;
+  opacity: 1;
 }
 
 .stop {
