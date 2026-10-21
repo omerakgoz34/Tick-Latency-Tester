@@ -3,7 +3,8 @@ import { useEffect } from "preact/hooks";
 
 export function PreviewHostBridge() {
   useEffect(() => {
-    if (!import.meta.env.DEV || window.parent === window) return;
+    if (!import.meta.env.DEV) return;
+    if (window.parent === window) return;
     let dispose = () => {};
     let alive = true;
     void import("@/lib/preview-host-bridge").then((mod) => {

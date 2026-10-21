@@ -5,8 +5,11 @@
     "**/*.css"
   ],
   "type": "module",
-  "overrides": {
-    "nf3": "0.3.17"
+  "packageManager": "pnpm@10.20.0",
+  "pnpm": {
+    "overrides": {
+      "nf3": "0.3.17"
+    }
   },
   "scripts": {
     "dev": "node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
