@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { defineConfig, type PluginOption } from "vite";
 import preact from "@preact/preset-vite";
 import tailwindcss from "@tailwindcss/vite";
@@ -8,8 +8,9 @@ import tailwindcss from "@tailwindcss/vite";
 const root = dirname(fileURLToPath(import.meta.url));
 
 async function optionalPlugin(rel: string, name: string): Promise<PluginOption | null> {
-  if (!existsSync(join(root, rel))) return null;
-  const mod = (await import(rel)) as Record<string, () => PluginOption>;
+  const file = join(root, rel);
+  if (!existsSync(file)) return null;
+  const mod = (await import(pathToFileURL(file).href)) as Record<string, () => PluginOption>;
   return mod[name]();
 }
 
