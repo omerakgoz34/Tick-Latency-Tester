@@ -337,7 +337,7 @@
 
 .stat span {
   color: var(--color-muted);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.04em;
   font-size: 0.72rem;
 }
 
@@ -505,10 +505,9 @@
 }
 
 .runs li {
-  display: grid;
-  grid-template-columns: 2.6rem 4.4rem 3.6rem 3.8rem minmax(6rem, 1fr);
-  gap: 0.45rem;
-  min-width: 18rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
   font-size: 0.9rem;

@@ -14,6 +14,7 @@ import { clock, ms, pct, tone } from "./format";
 import { paintGraph } from "./graph";
 import { getLobby, subscribeLobby, type EdgeState } from "./lobby";
 import { REGIONS, AREAS, type Region } from "./regions";
+import { MOVE_BYTES, BUSY_BYTES } from "./probe";
 import { TICK_HZ, ticksFor } from "./tick";
 
 const REGION_KEY = "tick-latency-region";
@@ -199,7 +200,7 @@ export function App() {
           <div class="stage-head">
             <h1>{region ? `${region.code}  ${region.city}` : "Pick a city"}</h1>
             <p>
-              {snap.running ? clock(snap.elapsedMs) : `${TICK_HZ} Hz target`}
+              {snap.running ? clock(snap.elapsedMs) : `${TICK_HZ} hertz target`}
               {" · "}
               7.8 ms tick
             </p>
@@ -230,17 +231,17 @@ export function App() {
             <div class="stats">
               <div class="stat">
                 <b class={snap.scored ? `tone-${snap.jitter < 8 ? "good" : snap.jitter < 20 ? "warn" : "bad"}` : "tone-muted"}>{snap.scored ? ms(snap.jitter, 1) : "—"}</b>
-                <span>JITTER</span>
+                <span>Jitter</span>
               </div>
               <div class="stat">
                 <b class={snap.lossWindow >= 4 ? "tone-bad" : snap.lossWindow >= 1 ? "tone-warn" : "tone-good"}>
                   {snap.scored ? pct(snap.lossWindow) : "—"}
                 </b>
-                <span>LOSS 2S</span>
+                <span>Loss, 2 seconds</span>
               </div>
               <div class="stat">
                 <b>{snap.p95 == null ? "—" : ms(snap.p95)}</b>
-                <span>P95</span>
+                <span>95th percentile</span>
               </div>
             </div>
           </div>
@@ -254,12 +255,15 @@ export function App() {
             ))}
           </div>
           <p class="meta">
-            <span>Min {ms(snap.min)}</span>
-            <span>Avg {ms(snap.avg)}</span>
-            <span>Max {ms(snap.max)}</span>
+            <span>Minimum {ms(snap.min)}</span>
+            <span>Average {ms(snap.avg)}</span>
+            <span>Maximum {ms(snap.max)}</span>
             <span>Session loss {snap.scored ? pct(snap.lossSession) : "—"}</span>
             <span>
-              {snap.achievedHz}/{TICK_HZ} Hz
+              {snap.achievedHz}/{TICK_HZ} hertz
+            </span>
+            <span>
+              {MOVE_BYTES}–{BUSY_BYTES} bytes
             </span>
           </p>
           {skipRate > 0.12 && snap.sent > 30 && (
@@ -304,8 +308,8 @@ export function App() {
                   <li key={run.at}>
                     <span>{run.code}</span>
                     <span>{ms(run.avg)} ms</span>
-                    <span>J {ms(run.jitter, 1)}</span>
-                    <span>L {pct(run.loss)}</span>
+                    <span>Jitter {ms(run.jitter, 1)}</span>
+                    <span>Loss {pct(run.loss)}</span>
                     <span>
                       {run.seconds}s · {when(run.at)}
                     </span>
@@ -317,9 +321,11 @@ export function App() {
           <details class="how">
             <summary>How this measures</summary>
             <p>
-              A 128-tick shooter sends a small packet every 7.8 ms and times the round trip. This
-              does that on a warm HTTPS/2 connection: one request per tick, 7-byte reply, handshake
-              samples thrown out.
+              A 128-tick shooter sends a packet every 7.8 ms and times the round trip. This does
+              that on a warm HTTPS/2 connection. Most ticks upload {MOVE_BYTES} bytes. Every eighth
+              tick uploads {BUSY_BYTES} bytes, closer to a busy client update than an empty check.
+              Handshake samples are thrown out. The reply stays short. The edge does not send a
+              world snapshot back.
             </p>
             <p>
               Jitter is the RFC 3550 average. Loss is a probe that was sent and did not return.

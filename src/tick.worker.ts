@@ -1,4 +1,4 @@
-import { probeOnce } from "./probe";
+import { probeOnce, tickBody } from "./probe";
 import { TICK_MS, WARMUP_OK, inFlightCap, probeTimeout } from "./tick";
 import type { Frame, InMsg, Quality, Sample } from "./types";
 
@@ -236,7 +236,7 @@ function launch(now: number) {
   inFlight++;
   sent++;
   noteSend(now);
-  probeOnce(url, timeout, parent).then((res) => {
+  probeOnce(url, timeout, parent, tickBody(sent)).then((res) => {
     if (epoch !== session) return;
     inFlight--;
     if (!res.ok && res.discard) return;
