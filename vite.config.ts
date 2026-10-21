@@ -28,6 +28,8 @@ export default defineConfig(({ command }) => ({
     preact({ reactAliasesEnabled: false, prefreshEnabled: true }),
   ],
   build: {
+    outDir: "dist",
+    emptyOutDir: true,
     target: "es2022",
     cssMinify: "lightningcss",
     minify: "esbuild",
