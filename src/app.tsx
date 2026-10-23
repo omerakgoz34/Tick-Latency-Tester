@@ -382,7 +382,7 @@ export function App() {
           </div>
           {snap.runs.length > 0 && (
             <section>
-              <div class="mb-[0.35rem] flex items-center justify-between gap-3">
+              <div class="mb-[0.35rem] flex w-fit items-center gap-2">
                 <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">Test History</p>
                 <button
                   type="button"
@@ -447,9 +447,9 @@ export function App() {
               A live range is a few megabytes a minute. The screen stays awake while it runs.
             </p>
             <p class="mb-0 max-w-[42rem]">
-              Every ping is scored by how far it rises above the normal ping. 0.1 ms over is still
-              100%. A ping at 1.5 times that level is a full spike, and half the pings at that
-              height is 0%.
+              Stability starts at 100%. A sample counts only when it is more than 0.1 ms above the
+              normal ping. It counts as one full spike at 1.5 times that ping, and as more if it
+              goes higher. The score falls to 0% when half of the samples are full spikes.
             </p>
           </section>
         </main>
