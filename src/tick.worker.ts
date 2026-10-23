@@ -158,15 +158,12 @@ function noteEma(rtt: number, now: number) {
 
 function noteSpike(rtt: number) {
   const baseline = percentile(0.5);
-  if (baseline == null) return;
+  if (baseline == null || baseline <= 0) return;
   spikeSamples++;
   const over = rtt - baseline;
-  if (over <= 2) return;
-  if (baseline <= 2) {
-    spikeWeight += 1;
-    return;
-  }
-  spikeWeight += Math.min(1, (over - 2) / (baseline - 2));
+  if (over <= 1) return;
+  const span = baseline - 1;
+  spikeWeight += span > 0 ? (over - 1) / span : over;
 }
 
 function stabilityPct(): number | null {
