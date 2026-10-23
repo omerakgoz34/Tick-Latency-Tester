@@ -45,7 +45,7 @@ const sendT = new Float64Array(256);
 let sendI = 0;
 let sendN = 0;
 
-let spikeCount = 0;
+let spikeWeight = 0;
 let spikeSamples = 0;
 let batch: Sample[] = [];
 let accum = 0;
@@ -77,7 +77,7 @@ function reset() {
   sendI = 0;
   sendN = 0;
   batch = [];
-  spikeCount = 0;
+  spikeWeight = 0;
   spikeSamples = 0;
   accum = 0;
   inFlight = 0;
@@ -160,12 +160,18 @@ function noteSpike(rtt: number) {
   const baseline = percentile(0.5);
   if (baseline == null) return;
   spikeSamples++;
-  if (rtt > baseline + 1) spikeCount++;
+  const over = rtt - baseline;
+  if (over <= 2) return;
+  if (baseline <= 2) {
+    spikeWeight += 1;
+    return;
+  }
+  spikeWeight += Math.min(1, (over - 2) / (baseline - 2));
 }
 
 function stabilityPct(): number | null {
   if (spikeSamples < 16) return null;
-  const raw = 100 * (1 - (2 * spikeCount) / spikeSamples);
+  const raw = 100 * (1 - (2 * spikeWeight) / spikeSamples);
   return Math.max(0, Math.min(100, raw));
 }
 
