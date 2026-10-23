@@ -384,7 +384,7 @@ export function App() {
             <section>
               <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
               <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
-                Every ping is scored by how far it rises above the normal ping. 1 ms over is still 100%. A ping at 1.5 times that level is a full spike, and half the pings at that height is 0%.
+                Every ping is scored by how far it rises above the normal ping. 0.1 ms over is still 100%. A ping at 1.5 times that level is a full spike, and half the pings at that height is 0%.
               </p>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run) => {
