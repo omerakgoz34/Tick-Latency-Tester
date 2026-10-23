@@ -160,10 +160,10 @@ function noteSpike(rtt: number) {
   const baseline = percentile(0.5);
   if (baseline == null || baseline <= 0) return;
   spikeSamples++;
-  const over = rtt - baseline;
-  if (over <= 1) return;
-  const span = baseline - 1;
-  spikeWeight += span > 0 ? (over - 1) / span : over;
+  const start = baseline + 1;
+  if (rtt <= start) return;
+  const span = 100 - start;
+  spikeWeight += span > 0 ? (rtt - start) / span : rtt - start + 1;
 }
 
 function stabilityPct(): number | null {
