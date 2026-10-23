@@ -177,7 +177,7 @@ export function App() {
             <p class="m-0 text-[0.72rem] font-semibold tracking-[0.16em] text-red">
               128-tick netcode
             </p>
-            <p class="m-0 text-[clamp(1.05rem,3.4vw,1.45rem)] font-semibold leading-none tracking-[0.08em]">
+            <p class="m-0 text-[clamp(1.05rem,3.4vw,1.45rem)] font-semibold leading-none tracking-[0.08em] text-paper">
               <b class="font-semibold text-red">TICK</b> LATENCY TESTER
             </p>
             <p class="m-0 mt-[0.2rem] text-[0.68rem] tracking-[0.08em] text-muted">{APP_VERSION}</p>
@@ -222,7 +222,7 @@ export function App() {
         </aside>
         <main class="flex min-w-0 flex-col gap-[0.8rem] overflow-auto p-4">
           <div>
-            <h1 class="m-0 text-[1.55rem] font-semibold tracking-[0.06em]">
+            <h1 class="m-0 text-[1.55rem] font-semibold tracking-[0.06em] text-paper">
               {region ? `${region.code}  ${region.city}` : "Pick a city"}
             </h1>
             <p class="m-0 mt-[0.1rem] text-[0.85rem] tracking-[0.08em] text-muted">
@@ -237,7 +237,7 @@ export function App() {
             </p>
           )}
           {snap.running && !snap.paused && snap.arming && (
-            <p class="m-0 border-l-[3px] border-muted px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em]">
+            <p class="m-0 border-l-[3px] border-muted px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em] text-paper">
               ARMING LINK
             </p>
           )}
@@ -290,7 +290,7 @@ export function App() {
                 <span class="text-[0.72rem] tracking-[0.04em] text-muted">Loss, 2 seconds</span>
               </div>
               <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
-                <b class="block text-[1.55rem] leading-none font-semibold tabular-nums">
+                <b class="block text-[1.55rem] leading-none font-semibold text-paper tabular-nums">
                   {snap.p95 == null ? "—" : ms(snap.p95)}
                 </b>
                 <span class="text-[0.72rem] tracking-[0.04em] text-muted">95th percentile</span>

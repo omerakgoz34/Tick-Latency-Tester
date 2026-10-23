@@ -41,6 +41,8 @@
 
   body {
     background-color: var(--color-bg);
+    color: var(--color-paper);
+    color-scheme: dark;
     background-image: linear-gradient(
       118deg,
       transparent 0 46%,
