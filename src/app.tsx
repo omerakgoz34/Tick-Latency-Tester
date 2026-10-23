@@ -384,7 +384,7 @@ export function App() {
             <section>
               <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
               <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
-                100% means every sample stayed within 1 ms of the normal ping. Spikes lower it by how far they jump past that.
+                100% means the tallest spike was 1 ms. 0% means half the ticks were spikes.
               </p>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run) => {

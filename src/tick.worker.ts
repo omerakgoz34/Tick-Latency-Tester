@@ -45,7 +45,7 @@ const sendT = new Float64Array(256);
 let sendI = 0;
 let sendN = 0;
 
-let spikeWeight = 0;
+let spikeCount = 0;
 let spikeSamples = 0;
 let batch: Sample[] = [];
 let accum = 0;
@@ -77,7 +77,7 @@ function reset() {
   sendI = 0;
   sendN = 0;
   batch = [];
-  spikeWeight = 0;
+  spikeCount = 0;
   spikeSamples = 0;
   accum = 0;
   inFlight = 0;
@@ -158,18 +158,14 @@ function noteEma(rtt: number, now: number) {
 
 function noteSpike(rtt: number) {
   const baseline = percentile(0.5);
-  if (baseline == null || baseline <= 0) return;
+  if (baseline == null) return;
   spikeSamples++;
-  const over = rtt - baseline - 1;
-  if (over <= 0) return;
-  const relative = over / baseline;
-  spikeWeight += relative * relative;
+  if (rtt > baseline + 1) spikeCount++;
 }
 
-function stabilityPct(elapsedMs: number): number | null {
+function stabilityPct(): number | null {
   if (spikeSamples < 16) return null;
-  const seconds = Math.max(1, elapsedMs / 1000);
-  const raw = 100 / (1 + spikeWeight / seconds);
+  const raw = 100 * (1 - (2 * spikeCount) / spikeSamples);
   return Math.max(0, Math.min(100, raw));
 }
 
@@ -216,7 +212,7 @@ function build(now: number, runningFlag: boolean): Frame {
     slips,
     scored,
     achievedHz: rate(now),
-    stability: stabilityPct(elapsed(now)),
+    stability: stabilityPct(),
     quality: runningFlag ? qualityOf(arming, lossWindow) : "idle",
     samples: batch,
   };
