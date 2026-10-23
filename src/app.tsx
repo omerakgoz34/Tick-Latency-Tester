@@ -121,7 +121,7 @@ function Graph() {
   return (
     <svg
       ref={svgRef}
-      class="block h-full w-full"
+      class="block h-full w-full select-none [-webkit-touch-callout:none]"
       role="img"
       aria-label="Ping over the last 10 seconds"
     >
@@ -299,7 +299,7 @@ export function App() {
               </div>
             </div>
           </div>
-          <div class="relative h-44 border border-line bg-panel-2 min-[861px]:h-64">
+          <div class="relative h-44 border border-line bg-panel-2 select-none [-webkit-touch-callout:none] min-[861px]:h-64">
             <Graph />
             {snap.sent === 0 && (
               <p class="pointer-events-none absolute inset-0 m-0 flex items-center justify-center tracking-[0.12em] text-muted">
