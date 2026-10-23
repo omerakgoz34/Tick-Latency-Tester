@@ -17,6 +17,11 @@ export function pct(n: number): string {
   return `${n >= 10 ? n.toFixed(0) : n.toFixed(1)}%`;
 }
 
+export function gamingScore(avg: number, jitter: number): number {
+  if (!Number.isFinite(avg) || !Number.isFinite(jitter)) return 0;
+  return (avg * jitter) / 100;
+}
+
 export function clock(value: number): string {
   const total = Math.max(0, Math.round(value / 1000));
   const minutes = Math.floor(total / 60);

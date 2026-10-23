@@ -10,7 +10,7 @@ import {
   subscribe,
   type Snap,
 } from "./engine";
-import { clock, ms, pct, tone } from "./format";
+import { clock, gamingScore, ms, pct, tone } from "./format";
 import { paintGraph } from "./graph";
 import { getLobby, subscribeLobby, type EdgeState } from "./lobby";
 import { REGIONS, type Region } from "./regions";
@@ -178,6 +178,8 @@ export function App() {
   const skipDenom = snap.sent + snap.skipped;
   const skipRate = skipDenom ? snap.skipped / skipDenom : 0;
   const duration = MODES.find((item) => item.id === mode)?.ms ?? 15_000;
+  const runScores = snap.runs.map((run) => gamingScore(run.avg, run.jitter));
+  const bestScore = runScores.length ? Math.min(...runScores) : null;
   const icon = `${import.meta.env.BASE_URL}favicon.svg`;
 
   return (
@@ -387,21 +389,32 @@ export function App() {
           {snap.runs.length > 0 && (
             <section>
               <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
+              <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
+                Gaming score is average ping times jitter percent. Lower is better.
+              </p>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
-                {snap.runs.map((run) => (
-                  <li
-                    key={run.at}
-                    class="flex flex-wrap gap-x-[0.85rem] gap-y-[0.35rem] text-[0.9rem] text-muted tabular-nums"
-                  >
-                    <span>{run.code}</span>
-                    <span>{ms(run.avg)} ms</span>
-                    <span>Jitter {ms(run.jitter, 1)}</span>
-                    <span>Loss {pct(run.loss)}</span>
-                    <span>
-                      {run.seconds}s · {when(run.at)}
-                    </span>
-                  </li>
-                ))}
+                {snap.runs.map((run, index) => {
+                  const score = runScores[index];
+                  const leading = score === bestScore;
+                  return (
+                    <li
+                      key={run.at}
+                      class="flex flex-wrap gap-x-[0.85rem] gap-y-[0.35rem] text-[0.9rem] text-muted tabular-nums"
+                    >
+                      <span class={leading ? "font-semibold text-good" : "text-paper"}>
+                        Gaming {score.toFixed(1)}
+                        {leading ? " Best" : ""}
+                      </span>
+                      <span>{run.code}</span>
+                      <span>{ms(run.avg)} ms</span>
+                      <span>Jitter {ms(run.jitter, 1)}</span>
+                      <span>Loss {pct(run.loss)}</span>
+                      <span>
+                        {run.seconds}s · {when(run.at)}
+                      </span>
+                    </li>
+                  );
+                })}
               </ol>
             </section>
           )}
