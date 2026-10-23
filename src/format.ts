@@ -19,7 +19,7 @@ export function pct(n: number): string {
 
 export function gamingScore(avg: number, jitter: number): number {
   if (!Number.isFinite(avg) || !Number.isFinite(jitter)) return 0;
-  return (avg * jitter) / 100;
+  return avg + jitter;
 }
 
 export function clock(value: number): string {

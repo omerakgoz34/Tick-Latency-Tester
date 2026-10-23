@@ -390,7 +390,7 @@ export function App() {
             <section>
               <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
               <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
-                Gaming score is average ping times jitter percent. Lower is better.
+                Gaming latency is average ping plus jitter. Lower is better.
               </p>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run, index) => {
@@ -402,7 +402,7 @@ export function App() {
                       class="flex flex-wrap gap-x-[0.85rem] gap-y-[0.35rem] text-[0.9rem] text-muted tabular-nums"
                     >
                       <span class={leading ? "font-semibold text-good" : "text-paper"}>
-                        Gaming {score.toFixed(1)}
+                        Gaming {ms(score)} ms
                         {leading ? " Best" : ""}
                       </span>
                       <span>{run.code}</span>
