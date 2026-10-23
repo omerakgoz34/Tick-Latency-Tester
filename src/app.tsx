@@ -454,6 +454,12 @@ export function App() {
               Handshake samples are thrown out. The reply stays short. The edge does not send a
               world snapshot back.
             </p>
+            <p class="mb-0 max-w-[42rem]">
+              Stability is calculated using how high and how many times ping spikes occurs relative to
+              measured baseline ping. A sample counts only when it is more than 0.1 ms above the
+              baseline ping. It counts as one full spike at 1.5 times of the baseline ping, and as more if it
+              goes higher. The score falls to 0% when half of the samples are full spikes.
+            </p>
             <p class="mb-4 max-w-[42rem]">
               Jitter is the RFC 3550 average. Loss is a probe that was sent and did not return.
               Stopping the test does not count as loss. If the link cannot hold that many probes in
@@ -466,11 +472,6 @@ export function App() {
             </p>
             <p class="mb-4 max-w-[42rem]">
               A live range is a few megabytes a minute. The screen stays awake while it runs.
-            </p>
-            <p class="mb-0 max-w-[42rem]">
-              Stability starts at 100%. A sample counts only when it is more than 0.1 ms above the
-              normal ping. It counts as one full spike at 1.5 times that ping, and as more if it
-              goes higher. The score falls to 0% when half of the samples are full spikes.
             </p>
           </section>
         </main>
