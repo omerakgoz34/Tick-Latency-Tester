@@ -25,6 +25,11 @@ function toneText(kind: "good" | "warn" | "bad" | "muted"): string {
   return "text-muted";
 }
 
+function pingText(kind: "good" | "warn" | "bad" | "muted"): string {
+  if (kind === "warn") return "text-orange";
+  return toneText(kind);
+}
+
 const REGION_KEY = "tick-latency-region";
 const APP_VERSION = "v0.3.0";
 
@@ -195,7 +200,7 @@ export function App() {
         <div class="flex shrink-0 flex-col items-end tracking-[0.12em]">
           <span class="text-[0.68rem] text-muted">UDP PATH</span>
           <strong
-            class={`text-[1.25rem] font-semibold tracking-[0.04em] tabular-nums ${toneText(snap.udpState === "blocked" ? "bad" : tone(snap.udp))}`}
+            class={`text-[1.25rem] font-semibold tracking-[0.04em] tabular-nums ${pingText(snap.udpState === "blocked" ? "bad" : tone(snap.udp))}`}
           >
             {snap.udpState === "blocked"
               ? "Blocked"
@@ -256,7 +261,7 @@ export function App() {
           <div class="flex flex-col items-stretch gap-4 min-[861px]:flex-row min-[861px]:items-end min-[861px]:justify-between">
             <div>
               <p
-                class={`m-0 flex items-end gap-2 font-semibold tabular-nums ${toneText(pingTone)}`}
+                class={`m-0 flex items-end gap-2 font-semibold tabular-nums ${pingText(pingTone)}`}
               >
                 {shown == null ? (
                   <span class="mb-1 h-1.5 w-12 bg-current" />
@@ -494,7 +499,7 @@ function EdgeButton({
           <em class="ml-[0.4rem] text-[0.72rem] tracking-[0.08em] text-red not-italic">Best</em>
         )}
       </span>
-      <span class={`text-[1.2rem] font-semibold tabular-nums ${toneText(tone(value))}`}>
+      <span class={`text-[1.2rem] font-semibold tabular-nums ${pingText(tone(value))}`}>
         {offline ? "Off" : value == null ? "···" : ms(value)}
       </span>
     </button>

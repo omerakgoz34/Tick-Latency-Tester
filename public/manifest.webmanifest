@@ -1,7 +1,7 @@
 {
   "id": "./",
   "name": "Tick Latency Tester",
-  "short_name": "Tick Latency",
+  "short_name": "Tick Latency Tester",
   "description": "128-tick latency, jitter, and packet loss. A match-style stream, not a one-shot ping.",
   "start_url": "./",
   "scope": "./",

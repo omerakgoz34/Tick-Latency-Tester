@@ -2,8 +2,8 @@ export type Tone = "good" | "warn" | "bad" | "muted";
 
 export function tone(n: number | null): Tone {
   if (n == null || !Number.isFinite(n)) return "muted";
-  if (n < 40) return "good";
-  if (n < 80) return "warn";
+  if (n < 30) return "good";
+  if (n <= 60) return "warn";
   return "bad";
 }
 
