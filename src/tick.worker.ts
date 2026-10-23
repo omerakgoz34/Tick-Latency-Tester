@@ -162,8 +162,8 @@ function noteSpike(rtt: number) {
   spikeSamples++;
   const start = baseline + 1;
   if (rtt <= start) return;
-  const span = 100 - start;
-  spikeWeight += span > 0 ? (rtt - start) / span : rtt - start + 1;
+  const span = baseline * 1.5 - start;
+  spikeWeight += span > 0 ? (rtt - start) / span : rtt - start;
 }
 
 function stabilityPct(): number | null {
