@@ -184,7 +184,7 @@ export function App() {
   return (
     <div class="flex min-h-full flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
       <PreviewHostBridge />
-      <header class="flex items-center justify-between gap-3 border-b border-line px-4 py-4">
+      <header class="flex items-center justify-between gap-3 border-b border-line px-4 py-5">
         <div class="flex min-w-0 items-center gap-[0.7rem]">
           <img class="h-9 w-9 shrink-0" src={icon} alt="" width="36" height="36" />
           <div>
@@ -212,7 +212,7 @@ export function App() {
       </header>
       <div class="grid min-h-0 flex-1 grid-cols-1 min-[861px]:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
         <aside class="max-h-[15.5rem] min-h-0 overflow-auto border-b border-line min-[861px]:max-h-none min-[861px]:border-r min-[861px]:border-b-0">
-          <p class="mx-[0.85rem] mt-3 mb-2 text-[0.78rem] tracking-[0.04em] text-muted">
+          <p class="mx-[0.85rem] mt-4 mb-3 text-[0.78rem] tracking-[0.04em] text-muted">
             Public city edges. Not game servers.
           </p>
           <div class="pt-2">
@@ -229,12 +229,12 @@ export function App() {
             ))}
           </div>
         </aside>
-        <main class="flex min-w-0 flex-col gap-[1.15rem] overflow-auto p-4">
+        <main class="flex min-w-0 flex-col gap-[1.45rem] overflow-auto p-4">
           <div>
             <h1 class="m-0 text-[1.55rem] font-semibold tracking-[0.06em] text-paper">
               {region ? `${region.code}  ${region.city}` : "Pick a city"}
             </h1>
-            <p class="m-0 mt-[0.35rem] text-[0.85rem] tracking-[0.08em] text-muted">
+            <p class="m-0 mt-2 text-[0.85rem] tracking-[0.08em] text-muted">
               {snap.running ? clock(snap.elapsedMs) : `${TICK_HZ} hertz target`}
               {" · "}
               7.8 ms tick
@@ -280,27 +280,27 @@ export function App() {
               </p>
             </div>
             <div class="grid flex-1 grid-cols-3 gap-[0.45rem] min-[861px]:max-w-[28rem]">
-              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-3 pb-2">
+              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-3.5 pb-2.5">
                 <b
                   class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? pingText(jitterTone(snap.jitter, snap.baseline ?? shown)) : "text-muted"}`}
                 >
                   {snap.scored ? `${ms(snap.jitter, 1)} ms` : "—"}
                 </b>
-                <span class="mt-1 block text-[0.72rem] tracking-[0.04em] text-muted">Jitter</span>
+                <span class="mt-1.5 block text-[0.72rem] tracking-[0.04em] text-muted">Jitter</span>
               </div>
-              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-3 pb-2">
+              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-3.5 pb-2.5">
                 <b
                   class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? pingText(lossTone(snap.lossWindow)) : "text-muted"}`}
                 >
                   {snap.scored ? pct(snap.lossWindow) : "—"}
                 </b>
-                <span class="mt-1 block text-[0.72rem] tracking-[0.04em] text-muted">Loss, 2 seconds</span>
+                <span class="mt-1.5 block text-[0.72rem] tracking-[0.04em] text-muted">Loss, 2 seconds</span>
               </div>
-              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-3 pb-2">
+              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-3.5 pb-2.5">
                 <b class="block text-[1.55rem] leading-none font-semibold text-paper tabular-nums">
                   {snap.p95 == null ? "—" : ms(snap.p95)}
                 </b>
-                <span class="mt-1 block text-[0.72rem] tracking-[0.04em] text-muted">95th percentile</span>
+                <span class="mt-1.5 block text-[0.72rem] tracking-[0.04em] text-muted">95th percentile</span>
               </div>
             </div>
           </div>
@@ -325,9 +325,15 @@ export function App() {
             </div>
           </div>
           <p class="m-0 flex flex-wrap gap-x-[0.85rem] gap-y-1 text-[0.85rem] tracking-[0.05em] text-muted tabular-nums">
-            <span>Minimum {ms(snap.min)}</span>
-            <span>Average {ms(snap.avg)}</span>
-            <span>Maximum {ms(snap.max)}</span>
+            <span class={snap.min == null ? undefined : pingText(tone(snap.min))}>
+              Minimum {ms(snap.min)}
+            </span>
+            <span class={snap.avg == null ? undefined : pingText(tone(snap.avg))}>
+              Average {ms(snap.avg)}
+            </span>
+            <span class={snap.max == null ? undefined : pingText(tone(snap.max))}>
+              Maximum {ms(snap.max)}
+            </span>
             <span class={snap.scored ? pingText(lossTone(snap.lossSession)) : undefined}>
               Session loss {snap.scored ? pct(snap.lossSession) : "—"}
             </span>
@@ -401,7 +407,7 @@ export function App() {
                   Clear
                 </button>
               </div>
-              <ol class="m-0 flex list-none flex-col gap-2 overflow-x-auto p-0">
+              <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run) => {
                   const stability = typeof run.stability === "number" ? run.stability : null;
                   const leading = stability != null && stability === bestStability;
@@ -434,31 +440,31 @@ export function App() {
             </section>
           )}
           <section class="text-[0.92rem] text-muted">
-            <h2 class="m-0 mb-3 text-[0.95rem] font-semibold tracking-[0.1em] text-paper">
+            <h2 class="m-0 mb-4 text-[0.95rem] font-semibold tracking-[0.1em] text-paper">
               How this measures
             </h2>
-            <p class="mb-3 max-w-[42rem] text-[0.78rem] tracking-[0.04em] text-warn">
+            <p class="mb-4 max-w-[42rem] text-[0.78rem] tracking-[0.04em] text-warn">
               This tool only intended to test 128-tick latency stability similar to how FPS games
               work using Amazon AWS servers. This is not an actual raw ping test for games.
             </p>
-            <p class="mb-3 max-w-[42rem]">
+            <p class="mb-4 max-w-[42rem]">
               A 128-tick shooter sends a packet every 7.8 ms and times the round trip. This does
               that on a warm HTTPS/2 connection. Most ticks upload {MOVE_BYTES} bytes. Every eighth
               tick uploads {BUSY_BYTES} bytes, closer to a busy client update than an empty check.
               Handshake samples are thrown out. The reply stays short. The edge does not send a
               world snapshot back.
             </p>
-            <p class="mb-3 max-w-[42rem]">
+            <p class="mb-4 max-w-[42rem]">
               Jitter is the RFC 3550 average. Loss is a probe that was sent and did not return.
               Stopping the test does not count as loss. If the link cannot hold that many probes in
               flight, extra ticks are skipped instead of queued.
             </p>
-            <p class="mb-3 max-w-[42rem]">
+            <p class="mb-4 max-w-[42rem]">
               UDP PATH is a STUN datagram to the nearest public relay. That number is closer to
               in-game ping. The city list is a cloud edge in that city, not a game server. A real
               match can be lower where the game peers off the public internet.
             </p>
-            <p class="mb-3 max-w-[42rem]">
+            <p class="mb-4 max-w-[42rem]">
               A live range is a few megabytes a minute. The screen stays awake while it runs.
             </p>
             <p class="mb-0 max-w-[42rem]">
