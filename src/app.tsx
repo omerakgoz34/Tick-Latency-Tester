@@ -17,6 +17,13 @@ import { REGIONS, AREAS, type Region } from "./regions";
 import { MOVE_BYTES, BUSY_BYTES } from "./probe";
 import { TICK_HZ, ticksFor } from "./tick";
 
+function toneText(kind: "good" | "warn" | "bad" | "muted"): string {
+  if (kind === "good") return "text-good";
+  if (kind === "warn") return "text-warn";
+  if (kind === "bad") return "text-red";
+  return "text-muted";
+}
+
 const REGION_KEY = "tick-latency-region";
 const APP_VERSION = "v0.1.2";
 
@@ -98,10 +105,15 @@ function Graph() {
   }, []);
 
   return (
-    <svg ref={svgRef} class="graph" role="img" aria-label="Ping over the last 10 seconds">
+    <svg
+      ref={svgRef}
+      class="block h-full w-full"
+      role="img"
+      aria-label="Ping over the last 10 seconds"
+    >
       <g ref={gridRef} />
-      <path ref={lossRef} class="losses" />
-      <polyline ref={lineRef} class="trace" />
+      <path ref={lossRef} class="fill-none stroke-red stroke-[1.5px]" />
+      <polyline ref={lineRef} class="fill-none stroke-paper stroke-[1.5px]" />
     </svg>
   );
 }
@@ -149,41 +161,51 @@ export function App() {
   const shown = snap.arming || snap.ema == null ? snap.last : snap.ema;
   const pingTone = tone(shown);
   const recent = getPoints().slice(-48);
-  const cells = recent.length
-    ? recent
-    : Array.from({ length: 48 }, () => null);
+  const cells = recent.length ? recent : Array.from({ length: 48 }, () => null);
   const skipDenom = snap.sent + snap.skipped;
   const skipRate = skipDenom ? snap.skipped / skipDenom : 0;
   const duration = MODES.find((item) => item.id === mode)?.ms ?? 15_000;
   const icon = `${import.meta.env.BASE_URL}favicon.svg`;
 
   return (
-    <div class="shell">
+    <div class="flex min-h-full flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
       <PreviewHostBridge />
-      <header class="topbar">
-        <div class="brand">
-          <img src={icon} alt="" width="36" height="36" />
+      <header class="flex items-center justify-between gap-3 border-b border-line px-4 py-[0.8rem]">
+        <div class="flex min-w-0 items-center gap-[0.7rem]">
+          <img class="h-9 w-9 shrink-0" src={icon} alt="" width="36" height="36" />
           <div>
-            <p class="kicker">128-tick netcode</p>
-            <p class="brand-name">
-              <b>TICK</b> LATENCY TESTER
+            <p class="m-0 text-[0.72rem] font-semibold tracking-[0.16em] text-red">
+              128-tick netcode
             </p>
-            <p class="version">{APP_VERSION}</p>
+            <p class="m-0 text-[clamp(1.05rem,3.4vw,1.45rem)] font-semibold leading-none tracking-[0.08em]">
+              <b class="font-semibold text-red">TICK</b> LATENCY TESTER
+            </p>
+            <p class="m-0 mt-[0.2rem] text-[0.68rem] tracking-[0.08em] text-muted">{APP_VERSION}</p>
           </div>
         </div>
-        <div class="udp-chip">
-          <span>UDP PATH</span>
-          <strong class={`tone-${snap.udpState === "blocked" ? "bad" : tone(snap.udp)}`}>
-            {snap.udpState === "blocked" ? "Blocked" : snap.udp == null ? "…" : `${ms(snap.udp)} ms`}
+        <div class="flex shrink-0 flex-col items-end tracking-[0.12em]">
+          <span class="text-[0.68rem] text-muted">UDP PATH</span>
+          <strong
+            class={`text-[1.25rem] font-semibold tracking-[0.04em] tabular-nums ${toneText(snap.udpState === "blocked" ? "bad" : tone(snap.udp))}`}
+          >
+            {snap.udpState === "blocked"
+              ? "Blocked"
+              : snap.udp == null
+                ? "…"
+                : `${ms(snap.udp)} ms`}
           </strong>
         </div>
       </header>
-      <div class="layout">
-        <aside class="servers">
-          <p class="servers-note">Public city edges. Not game servers.</p>
+      <div class="grid min-h-0 flex-1 grid-cols-1 min-[861px]:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
+        <aside class="max-h-[15.5rem] min-h-0 overflow-auto border-b border-line min-[861px]:max-h-none min-[861px]:border-r min-[861px]:border-b-0">
+          <p class="mx-[0.85rem] mt-3 mb-[0.2rem] text-[0.78rem] tracking-[0.04em] text-muted">
+            Public city edges. Not game servers.
+          </p>
           {AREAS.map((area) => (
             <section key={area}>
-              <h2 class="area">{area}</h2>
+              <h2 class="mx-[0.85rem] mt-[0.7rem] mb-[0.1rem] text-[0.72rem] font-semibold tracking-[0.16em] text-muted">
+                {area}
+              </h2>
               {REGIONS.filter((item) => item.area === area).map((item) => (
                 <EdgeButton
                   key={item.id}
@@ -198,65 +220,102 @@ export function App() {
             </section>
           ))}
         </aside>
-        <main class="stage">
-          <div class="stage-head">
-            <h1>{region ? `${region.code}  ${region.city}` : "Pick a city"}</h1>
-            <p>
+        <main class="flex min-w-0 flex-col gap-[0.8rem] overflow-auto p-4">
+          <div>
+            <h1 class="m-0 text-[1.55rem] font-semibold tracking-[0.06em]">
+              {region ? `${region.code}  ${region.city}` : "Pick a city"}
+            </h1>
+            <p class="m-0 mt-[0.1rem] text-[0.85rem] tracking-[0.08em] text-muted">
               {snap.running ? clock(snap.elapsedMs) : `${TICK_HZ} hertz target`}
               {" · "}
               7.8 ms tick
             </p>
           </div>
-          {snap.running && snap.paused && <p class="banner banner-warn">PAUSED</p>}
-          {snap.running && !snap.paused && snap.arming && <p class="banner">ARMING LINK</p>}
+          {snap.running && snap.paused && (
+            <p class="m-0 border-l-[3px] border-warn px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em] text-warn">
+              PAUSED
+            </p>
+          )}
+          {snap.running && !snap.paused && snap.arming && (
+            <p class="m-0 border-l-[3px] border-muted px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em]">
+              ARMING LINK
+            </p>
+          )}
           {snap.running && !snap.paused && !snap.arming && snap.quality === "bad" && (
-            <p class="banner banner-bad" role="status">
+            <p
+              class="m-0 border-l-[3px] border-red px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em] text-red"
+              role="status"
+            >
               NETWORK PROBLEM
             </p>
           )}
           {snap.running && !snap.paused && !snap.arming && snap.quality === "warn" && (
-            <p class="banner banner-warn" role="status">
+            <p
+              class="m-0 border-l-[3px] border-warn px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em] text-warn"
+              role="status"
+            >
               UNSTABLE
             </p>
           )}
-          <div class="hero">
+          <div class="flex flex-col items-stretch gap-4 min-[861px]:flex-row min-[861px]:items-end min-[861px]:justify-between">
             <div>
-              <p class={`ping tone-${pingTone}`}>
+              <p
+                class={`m-0 text-[clamp(4.2rem,16vw,6.6rem)] font-semibold leading-[0.82] tracking-[-0.03em] tabular-nums ${toneText(pingTone)}`}
+              >
                 {ms(shown)}
-                <span class="ping-unit">ms</span>
+                <span class="ml-1 text-[1.1rem] tracking-[0.14em] text-muted">ms</span>
               </p>
-              <p class="ping-sub">
-                {shown == null ? "Waiting for the first tick" : `${ticksFor(shown).toFixed(1)} server ticks`}
+              <p class="m-0 mt-1 text-[0.95rem] tracking-[0.08em] text-muted">
+                {shown == null
+                  ? "Waiting for the first tick"
+                  : `${ticksFor(shown).toFixed(1)} server ticks`}
                 {snap.last != null && snap.ema != null ? ` · last ${ms(snap.last)}` : ""}
               </p>
             </div>
-            <div class="stats">
-              <div class="stat">
-                <b class={snap.scored ? `tone-${snap.jitter < 8 ? "good" : snap.jitter < 20 ? "warn" : "bad"}` : "tone-muted"}>{snap.scored ? ms(snap.jitter, 1) : "—"}</b>
-                <span>Jitter</span>
+            <div class="grid flex-1 grid-cols-3 gap-[0.45rem] min-[861px]:max-w-[28rem]">
+              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
+                <b
+                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? toneText(snap.jitter < 8 ? "good" : snap.jitter < 20 ? "warn" : "bad") : "text-muted"}`}
+                >
+                  {snap.scored ? ms(snap.jitter, 1) : "—"}
+                </b>
+                <span class="text-[0.72rem] tracking-[0.04em] text-muted">Jitter</span>
               </div>
-              <div class="stat">
-                <b class={snap.lossWindow >= 4 ? "tone-bad" : snap.lossWindow >= 1 ? "tone-warn" : "tone-good"}>
+              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
+                <b
+                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.lossWindow >= 4 ? "text-red" : snap.lossWindow >= 1 ? "text-warn" : "text-good"}`}
+                >
                   {snap.scored ? pct(snap.lossWindow) : "—"}
                 </b>
-                <span>Loss, 2 seconds</span>
+                <span class="text-[0.72rem] tracking-[0.04em] text-muted">Loss, 2 seconds</span>
               </div>
-              <div class="stat">
-                <b>{snap.p95 == null ? "—" : ms(snap.p95)}</b>
-                <span>95th percentile</span>
+              <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
+                <b class="block text-[1.55rem] leading-none font-semibold tabular-nums">
+                  {snap.p95 == null ? "—" : ms(snap.p95)}
+                </b>
+                <span class="text-[0.72rem] tracking-[0.04em] text-muted">95th percentile</span>
               </div>
             </div>
           </div>
-          <div class="graph-wrap">
+          <div class="relative h-44 border border-line bg-panel-2 min-[861px]:h-64">
             <Graph />
-            {snap.sent === 0 && <p class="graph-empty">Tick stream appears here</p>}
+            {snap.sent === 0 && (
+              <p class="pointer-events-none absolute inset-0 m-0 flex items-center justify-center tracking-[0.12em] text-muted">
+                Tick stream appears here
+              </p>
+            )}
           </div>
-          <div class="strip" aria-hidden="true">
+          <div class="flex h-[0.55rem] gap-0.5" aria-hidden="true">
             {cells.map((point, index) => (
-              <span key={index} class={point == null ? "" : point.ok ? "ok" : "loss"} />
+              <span
+                key={index}
+                class={
+                  point == null ? "flex-1 bg-line" : point.ok ? "flex-1 bg-paper" : "flex-1 bg-red"
+                }
+              />
             ))}
           </div>
-          <p class="meta">
+          <p class="m-0 flex flex-wrap gap-x-[0.85rem] gap-y-1 text-[0.85rem] tracking-[0.05em] text-muted tabular-nums">
             <span>Minimum {ms(snap.min)}</span>
             <span>Average {ms(snap.avg)}</span>
             <span>Maximum {ms(snap.max)}</span>
@@ -269,30 +328,39 @@ export function App() {
             </span>
           </p>
           {skipRate > 0.12 && snap.sent > 30 && (
-            <p class="note">
+            <p class="m-0 text-[0.85rem] text-warn">
               Some ticks were skipped so a slow reply would not queue locally and inflate the ping.
             </p>
           )}
-          <div class="controls">
+          <div class="flex flex-wrap items-stretch gap-[0.55rem]">
             {snap.running ? (
-              <button type="button" class="stop" onClick={stopRange}>
-                <span>Stop</span>
+              <button
+                type="button"
+                class="min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border border-paper bg-transparent text-[1.35rem] font-semibold tracking-[0.16em] text-paper uppercase"
+                onClick={stopRange}
+              >
+                <span class="inline-block skew-x-[10deg]">Stop</span>
               </button>
             ) : (
               <button
                 type="button"
-                class="go"
+                class="min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border-0 bg-red text-[1.35rem] font-semibold tracking-[0.16em] text-bg uppercase enabled:hover:bg-[color-mix(in_srgb,var(--color-red)_86%,white)] disabled:cursor-not-allowed disabled:bg-[#7a2a32] disabled:text-paper"
                 disabled={!region}
                 onClick={() => region && startRange(region, duration)}
               >
-                <span>Start range</span>
+                <span class="inline-block skew-x-[10deg]">Start range</span>
               </button>
             )}
-            <div class="seg" role="group" aria-label="Duration">
+            <div
+              class="flex min-h-[3.25rem] flex-[2_1_16rem] border border-line"
+              role="group"
+              aria-label="Duration"
+            >
               {MODES.map((item) => (
                 <button
                   key={item.id}
                   type="button"
+                  class="flex-1 cursor-pointer border-0 bg-transparent font-semibold tracking-[0.12em] text-muted uppercase aria-pressed:bg-paper aria-pressed:text-bg disabled:cursor-not-allowed"
                   aria-pressed={mode === item.id}
                   disabled={snap.running}
                   onClick={() => setMode(item.id)}
@@ -304,10 +372,13 @@ export function App() {
           </div>
           {snap.runs.length > 0 && (
             <section>
-              <p class="runs-label">LAST RANGES</p>
-              <ol class="runs">
+              <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
+              <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run) => (
-                  <li key={run.at}>
+                  <li
+                    key={run.at}
+                    class="flex flex-wrap gap-x-[0.85rem] gap-y-[0.35rem] text-[0.9rem] text-muted tabular-nums"
+                  >
                     <span>{run.code}</span>
                     <span>{ms(run.avg)} ms</span>
                     <span>Jitter {ms(run.jitter, 1)}</span>
@@ -320,27 +391,34 @@ export function App() {
               </ol>
             </section>
           )}
-          <section class="how">
-            <h2>How this measures</h2>
-            <p class="how-warn">This test only intended to test 128-tick latency stability similar to how FPS games work. Not an actual raw game ping test.</p>
-            <p>
+          <section class="text-[0.92rem] text-muted">
+            <h2 class="m-0 mb-[0.45rem] text-[0.95rem] font-semibold tracking-[0.1em] text-paper">
+              How this measures
+            </h2>
+            <p class="mb-[0.55rem] max-w-[42rem] text-[0.78rem] tracking-[0.04em] text-warn">
+              This test only intended to test 128-tick latency stability similar to how FPS games
+              work. Not an actual raw game ping test.
+            </p>
+            <p class="mb-[0.55rem] max-w-[42rem]">
               A 128-tick shooter sends a packet every 7.8 ms and times the round trip. This does
               that on a warm HTTPS/2 connection. Most ticks upload {MOVE_BYTES} bytes. Every eighth
               tick uploads {BUSY_BYTES} bytes, closer to a busy client update than an empty check.
               Handshake samples are thrown out. The reply stays short. The edge does not send a
               world snapshot back.
             </p>
-            <p>
+            <p class="mb-[0.55rem] max-w-[42rem]">
               Jitter is the RFC 3550 average. Loss is a probe that was sent and did not return.
               Stopping the test does not count as loss. If the link cannot hold that many probes in
               flight, extra ticks are skipped instead of queued.
             </p>
-            <p>
+            <p class="mb-[0.55rem] max-w-[42rem]">
               UDP PATH is a STUN datagram to the nearest public relay. That number is closer to
               in-game ping. The city list is a cloud edge in that city, not a game server. A real
               match can be lower where the game peers off the public internet.
             </p>
-            <p>A live range is a few megabytes a minute. The screen stays awake while it runs.</p>
+            <p class="mb-[0.55rem] max-w-[42rem]">
+              A live range is a few megabytes a minute. The screen stays awake while it runs.
+            </p>
           </section>
         </main>
       </div>
@@ -368,17 +446,23 @@ function EdgeButton({
   return (
     <button
       type="button"
-      class={selected ? "edge is-on" : "edge"}
+      class={
+        selected
+          ? "grid w-full min-h-11 cursor-pointer grid-cols-[2.7rem_minmax(0,1fr)_auto] items-center gap-[0.45rem] border-y-0 border-r-0 border-l-2 border-l-red bg-panel px-[0.85rem] py-[0.2rem] text-left font-[inherit] text-paper disabled:cursor-not-allowed disabled:opacity-70"
+          : "grid w-full min-h-11 cursor-pointer grid-cols-[2.7rem_minmax(0,1fr)_auto] items-center gap-[0.45rem] border-y-0 border-r-0 border-l-2 border-l-transparent bg-transparent px-[0.85rem] py-[0.2rem] text-left font-[inherit] text-paper disabled:cursor-not-allowed disabled:opacity-70"
+      }
       aria-pressed={selected}
       disabled={locked}
       onClick={() => onPick(region.id)}
     >
-      <span class="edge-code">{region.code}</span>
-      <span class="edge-city">
+      <span class="font-semibold tracking-[0.06em]">{region.code}</span>
+      <span class="truncate text-[0.92rem] text-muted">
         {region.city}
-        {best && <em>Best</em>}
+        {best && (
+          <em class="ml-[0.4rem] text-[0.72rem] tracking-[0.08em] text-red not-italic">Best</em>
+        )}
       </span>
-      <span class={`edge-ping tone-${tone(value)}`}>
+      <span class={`text-[1.2rem] font-semibold tabular-nums ${toneText(tone(value))}`}>
         {offline ? "Off" : value == null ? "···" : ms(value)}
       </span>
     </button>

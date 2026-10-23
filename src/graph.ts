@@ -38,8 +38,8 @@ export function paintGraph(
   for (let i = 0; i <= steps; i++) {
     const y = padT + (ih * i) / steps;
     const label = Math.round(maxR - (maxR * i) / steps);
-    gridMarkup += `<line x1="${padL}" y1="${y}" x2="${w - padR}" y2="${y}" />`;
-    gridMarkup += `<text x="2" y="${y + 3}">${label}</text>`;
+    gridMarkup += `<line class="stroke-line" stroke-width="1" x1="${padL}" y1="${y}" x2="${w - padR}" y2="${y}" />`;
+    gridMarkup += `<text class="fill-muted font-sans text-[11px]" x="2" y="${y + 3}">${label}</text>`;
   }
   grid.innerHTML = gridMarkup;
 
