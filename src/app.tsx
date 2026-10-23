@@ -320,8 +320,9 @@ export function App() {
               </ol>
             </section>
           )}
-          <details class="how">
-            <summary>How this measures</summary>
+          <section class="how">
+            <h2>How this measures</h2>
+            <p class="how-warn">Not a real ping test. Only for checking 128-tick latency stability.</p>
             <p>
               A 128-tick shooter sends a packet every 7.8 ms and times the round trip. This does
               that on a warm HTTPS/2 connection. Most ticks upload {MOVE_BYTES} bytes. Every eighth
@@ -340,7 +341,7 @@ export function App() {
               match can be lower where the game peers off the public internet.
             </p>
             <p>A live range is a few megabytes a minute. The screen stays awake while it runs.</p>
-          </details>
+          </section>
         </main>
       </div>
     </div>

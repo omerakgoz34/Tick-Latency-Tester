@@ -56,13 +56,11 @@
   }
 
   button:not(:disabled),
-  [role="button"]:not(:disabled),
-  summary {
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
 
-  button:focus-visible,
-  summary:focus-visible {
+  button:focus-visible {
     outline: 2px solid var(--color-red);
     outline-offset: 2px;
   }
@@ -527,13 +525,18 @@
   font-size: 0.92rem;
 }
 
-.how summary {
-  min-height: 2.75rem;
-  display: flex;
-  align-items: center;
+.how h2 {
+  margin: 0 0 0.45rem;
   letter-spacing: 0.1em;
-  color: var(--color-paper);
+  font-size: 0.95rem;
   font-weight: 600;
+  color: var(--color-paper);
+}
+
+.how-warn {
+  color: var(--color-warn);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
 }
 
 .how p {
