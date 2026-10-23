@@ -158,10 +158,12 @@ function noteEma(rtt: number, now: number) {
 
 function noteSpike(rtt: number) {
   const baseline = percentile(0.5);
-  if (baseline == null) return;
+  if (baseline == null || baseline <= 0) return;
   spikeSamples++;
   const over = rtt - baseline - 1;
-  if (over > 0) spikeWeight += over;
+  if (over <= 0) return;
+  const relative = over / baseline;
+  spikeWeight += relative * relative;
 }
 
 function stabilityPct(elapsedMs: number): number | null {
