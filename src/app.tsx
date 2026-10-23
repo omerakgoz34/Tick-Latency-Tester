@@ -11,7 +11,7 @@ import {
   subscribe,
   type Snap,
 } from "./engine";
-import { clock, jitterTone, lossTone, ms, pct, tone } from "./format";
+import { clock, jitterTone, lossTone, ms, pct, stabilityTone, tone } from "./format";
 import { paintGraph } from "./graph";
 import { getLobby, subscribeLobby, type EdgeState } from "./lobby";
 import { REGIONS, type Region } from "./regions";
@@ -284,7 +284,7 @@ export function App() {
                 <b
                   class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? pingText(jitterTone(snap.jitter, snap.baseline ?? shown)) : "text-muted"}`}
                 >
-                  {snap.scored ? ms(snap.jitter, 1) : "—"}
+                  {snap.scored ? `${ms(snap.jitter, 1)} ms` : "—"}
                 </b>
                 <span class="text-[0.72rem] tracking-[0.04em] text-muted">Jitter</span>
               </div>
@@ -408,13 +408,19 @@ export function App() {
                       key={run.at}
                       class="flex flex-wrap gap-x-[0.85rem] gap-y-[0.35rem] text-[0.9rem] text-muted tabular-nums"
                     >
-                      <span class={leading ? "font-semibold text-good" : "text-paper"}>
+                      <span
+                        class={
+                          stability == null
+                            ? "text-paper"
+                            : `${leading ? "font-semibold " : ""}${pingText(stabilityTone(stability))}`
+                        }
+                      >
                         Stability {stability == null ? "—" : pct(stability)}
                         {leading ? " Best" : ""}
                       </span>
                       <span>{run.code}</span>
                       <span>{ms(run.avg)} ms</span>
-                      <span>Jitter {ms(run.jitter, 1)}</span>
+                      <span>Jitter {ms(run.jitter, 1)} ms</span>
                       <span>Loss {pct(run.loss)}</span>
                       <span>
                         {run.seconds}s · {when(run.at)}

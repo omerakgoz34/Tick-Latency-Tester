@@ -21,6 +21,12 @@ export function lossTone(loss: number): Tone {
   return "bad";
 }
 
+export function stabilityTone(stability: number): Tone {
+  if (stability > 95) return "good";
+  if (stability >= 85) return "warn";
+  return "bad";
+}
+
 export function ms(n: number | null, digits = 0): string {
   if (n == null || !Number.isFinite(n)) return "—";
   return digits ? n.toFixed(digits) : String(Math.round(n));
