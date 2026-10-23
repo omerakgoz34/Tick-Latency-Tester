@@ -45,7 +45,6 @@ const sendT = new Float64Array(256);
 let sendI = 0;
 let sendN = 0;
 
-let base: number | null = null;
 let spikeWeight = 0;
 let spikeSamples = 0;
 let batch: Sample[] = [];
@@ -78,7 +77,6 @@ function reset() {
   sendI = 0;
   sendN = 0;
   batch = [];
-  base = null;
   spikeWeight = 0;
   spikeSamples = 0;
   accum = 0;
@@ -159,19 +157,11 @@ function noteEma(rtt: number, now: number) {
 }
 
 function noteSpike(rtt: number) {
-  if (base == null) {
-    base = rtt;
-    return;
-  }
-  const gate = base * 0.25;
-  if (rtt > base + gate) {
-    spikeWeight += (rtt - base) / base;
-    spikeSamples++;
-    return;
-  }
+  const baseline = percentile(0.5);
+  if (baseline == null) return;
   spikeSamples++;
-  const pull = rtt < base ? 0.2 : 0.05;
-  base += (rtt - base) * pull;
+  const over = rtt - baseline - 1;
+  if (over > 0) spikeWeight += over;
 }
 
 function stabilityPct(elapsedMs: number): number | null {
@@ -277,12 +267,12 @@ function launch(now: number) {
         warmupLeft--;
         return;
       }
+      noteSpike(res.rtt);
       okCount++;
       scored++;
       addRtt(res.rtt);
       noteEma(res.rtt, doneAt);
       noteJitter(res.rtt);
-      noteSpike(res.rtt);
       pushWindow(true, doneAt);
       batch.push({ dt, rtt: res.rtt, ok: true });
       return;

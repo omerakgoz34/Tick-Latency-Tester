@@ -384,7 +384,7 @@ export function App() {
             <section>
               <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
               <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
-                Stability falls as ping spikes get more frequent and taller. Higher is better.
+                100% means no spike taller than 1 ms above the normal ping. Taller and more frequent spikes lower it.
               </p>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run) => {
