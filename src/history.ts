@@ -11,6 +11,7 @@ export type SavedRun = {
   loss: number;
   p95: number;
   udp: number | null;
+  stability: number | null;
 };
 
 export function loadRuns(): SavedRun[] {

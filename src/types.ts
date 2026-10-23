@@ -30,6 +30,7 @@ export type Frame = {
   slips: number;
   scored: number;
   achievedHz: number;
+  stability: number | null;
   quality: Quality;
   samples: Sample[];
 };

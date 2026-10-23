@@ -25,6 +25,7 @@ export type Snap = {
   scored: number;
   achievedHz: number;
   quality: Quality;
+  stability: number | null;
   udp: number | null;
   udpState: UdpState;
   runs: SavedRun[];
@@ -51,6 +52,7 @@ const empty: Snap = {
   scored: 0,
   achievedHz: 0,
   quality: "idle",
+  stability: null,
   udp: null,
   udpState: "pending",
   runs: [],
@@ -128,6 +130,7 @@ function applyFrame(frame: Frame) {
     slips: frame.slips,
     scored: frame.scored,
     achievedHz: frame.achievedHz,
+    stability: frame.stability,
     quality: frame.quality,
   });
   if (stopped) finishSession();
@@ -151,6 +154,7 @@ function finishSession() {
     loss: snap.lossSession,
     p95: snap.p95 ?? avg,
     udp: snap.udp,
+    stability: snap.stability,
   });
   publish({ ...snap, runs, running: false, paused: false, arming: false, quality: "idle" });
 }
@@ -213,6 +217,7 @@ export function startRange(next: Region, durationMs: number) {
     scored: 0,
     achievedHz: 0,
     quality: "idle",
+    stability: null,
   });
   ensureWorker().postMessage({
     type: "start",

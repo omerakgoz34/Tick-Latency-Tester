@@ -10,7 +10,7 @@ import {
   subscribe,
   type Snap,
 } from "./engine";
-import { clock, gamingScore, ms, pct, tone } from "./format";
+import { clock, ms, pct, tone } from "./format";
 import { paintGraph } from "./graph";
 import { getLobby, subscribeLobby, type EdgeState } from "./lobby";
 import { REGIONS, type Region } from "./regions";
@@ -178,8 +178,10 @@ export function App() {
   const skipDenom = snap.sent + snap.skipped;
   const skipRate = skipDenom ? snap.skipped / skipDenom : 0;
   const duration = MODES.find((item) => item.id === mode)?.ms ?? 15_000;
-  const runScores = snap.runs.map((run) => gamingScore(run.avg, run.jitter));
-  const bestScore = runScores.length ? Math.min(...runScores) : null;
+  const bestStability = snap.runs.reduce<number | null>((best, run) => {
+    if (typeof run.stability !== "number") return best;
+    return best == null || run.stability > best ? run.stability : best;
+  }, null);
   const icon = `${import.meta.env.BASE_URL}favicon.svg`;
 
   return (
@@ -257,14 +259,6 @@ export function App() {
               role="status"
             >
               NETWORK PROBLEM
-            </p>
-          )}
-          {snap.running && !snap.paused && !snap.arming && snap.quality === "warn" && (
-            <p
-              class="m-0 border-l-[3px] border-warn px-[0.55rem] py-[0.35rem] text-[0.95rem] font-semibold tracking-[0.16em] text-warn"
-              role="status"
-            >
-              UNSTABLE
             </p>
           )}
           <div class="flex flex-col items-stretch gap-4 min-[861px]:flex-row min-[861px]:items-end min-[861px]:justify-between">
@@ -390,19 +384,19 @@ export function App() {
             <section>
               <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
               <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
-                Gaming latency is average ping plus jitter. Lower is better.
+                Stability falls as ping spikes get more frequent and taller. Higher is better.
               </p>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
-                {snap.runs.map((run, index) => {
-                  const score = runScores[index];
-                  const leading = score === bestScore;
+                {snap.runs.map((run) => {
+                  const stability = typeof run.stability === "number" ? run.stability : null;
+                  const leading = stability != null && stability === bestStability;
                   return (
                     <li
                       key={run.at}
                       class="flex flex-wrap gap-x-[0.85rem] gap-y-[0.35rem] text-[0.9rem] text-muted tabular-nums"
                     >
                       <span class={leading ? "font-semibold text-good" : "text-paper"}>
-                        Gaming {ms(score)} ms
+                        Stability {stability == null ? "—" : pct(stability)}
                         {leading ? " Best" : ""}
                       </span>
                       <span>{run.code}</span>
