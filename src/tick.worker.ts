@@ -163,7 +163,7 @@ function noteSpike(rtt: number) {
     base = rtt;
     return;
   }
-  const gate = Math.max(8, base * 0.25);
+  const gate = base * 0.25;
   if (rtt > base + gate) {
     spikeWeight += (rtt - base) / base;
     spikeSamples++;
