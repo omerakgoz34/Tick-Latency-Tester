@@ -18,6 +18,7 @@ export type Snap = {
   avg: number | null;
   max: number | null;
   p95: number | null;
+  baseline: number | null;
   sent: number;
   lost: number;
   skipped: number;
@@ -45,6 +46,7 @@ const empty: Snap = {
   avg: null,
   max: null,
   p95: null,
+  baseline: null,
   sent: 0,
   lost: 0,
   skipped: 0,
@@ -124,6 +126,7 @@ function applyFrame(frame: Frame) {
     avg: frame.avg,
     max: frame.max,
     p95: frame.p95,
+    baseline: frame.baseline,
     sent: frame.sent,
     lost: frame.lost,
     skipped: frame.skipped,
@@ -210,6 +213,7 @@ export function startRange(next: Region, durationMs: number) {
     avg: null,
     max: null,
     p95: null,
+    baseline: null,
     sent: 0,
     lost: 0,
     skipped: 0,

@@ -11,7 +11,7 @@ import {
   subscribe,
   type Snap,
 } from "./engine";
-import { clock, ms, pct, tone } from "./format";
+import { clock, jitterTone, lossTone, ms, pct, tone } from "./format";
 import { paintGraph } from "./graph";
 import { getLobby, subscribeLobby, type EdgeState } from "./lobby";
 import { REGIONS, type Region } from "./regions";
@@ -282,7 +282,7 @@ export function App() {
             <div class="grid flex-1 grid-cols-3 gap-[0.45rem] min-[861px]:max-w-[28rem]">
               <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
                 <b
-                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? toneText(snap.jitter < 8 ? "good" : snap.jitter < 20 ? "warn" : "bad") : "text-muted"}`}
+                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? pingText(jitterTone(snap.jitter, snap.baseline ?? shown)) : "text-muted"}`}
                 >
                   {snap.scored ? ms(snap.jitter, 1) : "—"}
                 </b>
@@ -290,7 +290,7 @@ export function App() {
               </div>
               <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
                 <b
-                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? (snap.lossWindow >= 4 ? "text-red" : snap.lossWindow >= 1 ? "text-warn" : "text-good") : "text-muted"}`}
+                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? pingText(lossTone(snap.lossWindow)) : "text-muted"}`}
                 >
                   {snap.scored ? pct(snap.lossWindow) : "—"}
                 </b>
@@ -326,7 +326,9 @@ export function App() {
             <span>Minimum {ms(snap.min)}</span>
             <span>Average {ms(snap.avg)}</span>
             <span>Maximum {ms(snap.max)}</span>
-            <span>Session loss {snap.scored ? pct(snap.lossSession) : "—"}</span>
+            <span class={snap.scored ? pingText(lossTone(snap.lossSession)) : undefined}>
+              Session loss {snap.scored ? pct(snap.lossSession) : "—"}
+            </span>
             <span>
               {snap.achievedHz}/{TICK_HZ} hertz
             </span>

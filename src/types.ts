@@ -24,6 +24,7 @@ export type Frame = {
   avg: number | null;
   max: number | null;
   p95: number | null;
+  baseline: number | null;
   sent: number;
   lost: number;
   skipped: number;

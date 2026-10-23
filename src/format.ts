@@ -7,6 +7,20 @@ export function tone(n: number | null): Tone {
   return "bad";
 }
 
+export function jitterTone(jitter: number, baseline: number | null): Tone {
+  if (baseline == null || !Number.isFinite(baseline) || baseline <= 0) return "muted";
+  const ratio = jitter / baseline;
+  if (ratio < 0.1) return "good";
+  if (ratio <= 0.25) return "warn";
+  return "bad";
+}
+
+export function lossTone(loss: number): Tone {
+  if (loss < 1) return "good";
+  if (loss <= 5) return "warn";
+  return "bad";
+}
+
 export function ms(n: number | null, digits = 0): string {
   if (n == null || !Number.isFinite(n)) return "—";
   return digits ? n.toFixed(digits) : String(Math.round(n));

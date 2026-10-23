@@ -209,6 +209,7 @@ function build(now: number, runningFlag: boolean): Frame {
     avg: okCount ? sum / okCount : null,
     max,
     p95: percentile(0.95),
+    baseline: percentile(0.5),
     sent,
     lost,
     skipped,
