@@ -13,7 +13,7 @@ import {
 import { clock, ms, pct, tone } from "./format";
 import { paintGraph } from "./graph";
 import { getLobby, subscribeLobby, type EdgeState } from "./lobby";
-import { REGIONS, AREAS, type Region } from "./regions";
+import { REGIONS, type Region } from "./regions";
 import { MOVE_BYTES, BUSY_BYTES } from "./probe";
 import { TICK_HZ, ticksFor } from "./tick";
 
@@ -51,6 +51,19 @@ function bestId(rows: Record<string, EdgeState>): string | null {
     if (!best || row.rtt < best.rtt) best = { id: region.id, rtt: row.rtt };
   }
   return best?.id ?? null;
+}
+
+function edgeRank(row: EdgeState | undefined): number {
+  return row?.rtt == null ? Number.POSITIVE_INFINITY : row.rtt;
+}
+
+function orderedRegions(rows: Record<string, EdgeState>): Region[] {
+  const index = new Map(REGIONS.map((region, i) => [region.id, i]));
+  return [...REGIONS].sort((a, b) => {
+    const delta = edgeRank(rows[a.id]) - edgeRank(rows[b.id]);
+    if (delta !== 0) return delta;
+    return (index.get(a.id) ?? 0) - (index.get(b.id) ?? 0);
+  });
 }
 
 function when(at: number): string {
@@ -201,24 +214,19 @@ export function App() {
           <p class="mx-[0.85rem] mt-3 mb-[0.2rem] text-[0.78rem] tracking-[0.04em] text-muted">
             Public city edges. Not game servers.
           </p>
-          {AREAS.map((area) => (
-            <section key={area}>
-              <h2 class="mx-[0.85rem] mt-[0.7rem] mb-[0.1rem] text-[0.72rem] font-semibold tracking-[0.16em] text-muted">
-                {area}
-              </h2>
-              {REGIONS.filter((item) => item.area === area).map((item) => (
-                <EdgeButton
-                  key={item.id}
-                  region={item}
-                  row={lobby[item.id]}
-                  selected={item.id === regionId}
-                  best={item.id === best}
-                  locked={snap.running}
-                  onPick={setRegionId}
-                />
-              ))}
-            </section>
-          ))}
+          <div class="pt-2">
+            {orderedRegions(lobby).map((item) => (
+              <EdgeButton
+                key={item.id}
+                region={item}
+                row={lobby[item.id]}
+                selected={item.id === regionId}
+                best={item.id === best}
+                locked={snap.running}
+                onPick={setRegionId}
+              />
+            ))}
+          </div>
         </aside>
         <main class="flex min-w-0 flex-col gap-[0.8rem] overflow-auto p-4">
           <div>
@@ -260,10 +268,16 @@ export function App() {
           <div class="flex flex-col items-stretch gap-4 min-[861px]:flex-row min-[861px]:items-end min-[861px]:justify-between">
             <div>
               <p
-                class={`m-0 text-[clamp(4.2rem,16vw,6.6rem)] font-semibold leading-[0.82] tracking-[-0.03em] tabular-nums ${toneText(pingTone)}`}
+                class={`m-0 flex items-end gap-2 font-semibold tabular-nums ${toneText(pingTone)}`}
               >
-                {ms(shown)}
-                <span class="ml-1 text-[1.1rem] tracking-[0.14em] text-muted">ms</span>
+                {shown == null ? (
+                  <span class="mb-1 h-1.5 w-12 bg-current" />
+                ) : (
+                  <span class="text-[clamp(4.2rem,16vw,6.6rem)] leading-none tracking-[-0.03em]">
+                    {ms(shown)}
+                  </span>
+                )}
+                <span class="mb-1 text-[1.1rem] tracking-[0.14em] text-muted">ms</span>
               </p>
               <p class="m-0 mt-1 text-[0.95rem] tracking-[0.08em] text-muted">
                 {shown == null
@@ -283,7 +297,7 @@ export function App() {
               </div>
               <div class="min-w-0 border border-line bg-panel px-[0.65rem] pt-2 pb-[0.4rem]">
                 <b
-                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.lossWindow >= 4 ? "text-red" : snap.lossWindow >= 1 ? "text-warn" : "text-good"}`}
+                  class={`block text-[1.55rem] leading-none font-semibold tabular-nums ${snap.scored ? (snap.lossWindow >= 4 ? "text-red" : snap.lossWindow >= 1 ? "text-warn" : "text-good") : "text-muted"}`}
                 >
                   {snap.scored ? pct(snap.lossWindow) : "—"}
                 </b>
@@ -336,7 +350,7 @@ export function App() {
             {snap.running ? (
               <button
                 type="button"
-                class="min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border border-paper bg-transparent text-[1.35rem] font-semibold tracking-[0.16em] text-paper uppercase"
+                class="mx-1 min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border border-paper bg-transparent text-[1.35rem] font-semibold tracking-[0.16em] text-paper uppercase"
                 onClick={stopRange}
               >
                 <span class="inline-block skew-x-[10deg]">Stop</span>
@@ -344,7 +358,7 @@ export function App() {
             ) : (
               <button
                 type="button"
-                class="min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border-0 bg-red text-[1.35rem] font-semibold tracking-[0.16em] text-bg uppercase enabled:hover:bg-[color-mix(in_srgb,var(--color-red)_86%,white)] disabled:cursor-not-allowed disabled:bg-[#7a2a32] disabled:text-paper"
+                class="mx-1 min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border-0 bg-red text-[1.35rem] font-semibold tracking-[0.16em] text-bg uppercase enabled:hover:bg-[color-mix(in_srgb,var(--color-red)_86%,white)] disabled:cursor-not-allowed disabled:bg-[#7a2a32] disabled:text-paper"
                 disabled={!region}
                 onClick={() => region && startRange(region, duration)}
               >
