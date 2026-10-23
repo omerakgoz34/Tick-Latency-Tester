@@ -396,8 +396,8 @@ export function App() {
               How this measures
             </h2>
             <p class="mb-[0.55rem] max-w-[42rem] text-[0.78rem] tracking-[0.04em] text-warn">
-              This test only intended to test 128-tick latency stability similar to how FPS games
-              work. Not an actual raw game ping test.
+              This tool only intended to test 128-tick latency stability similar to how FPS games
+              work using Amazon AWS servers. This is not an actual raw ping test for games.
             </p>
             <p class="mb-[0.55rem] max-w-[42rem]">
               A 128-tick shooter sends a packet every 7.8 ms and times the round trip. This does
