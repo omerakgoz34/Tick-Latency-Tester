@@ -2,8 +2,8 @@ export type ProbeResult =
   | { ok: true; rtt: number }
   | { ok: false; rtt: number; discard: boolean };
 
-export const MOVE_BYTES = 156;
-export const BUSY_BYTES = 384;
+export const MOVE_BYTES = 128;
+export const BUSY_BYTES = 256;
 
 const ALPHA = "abcdefghijklmnop";
 

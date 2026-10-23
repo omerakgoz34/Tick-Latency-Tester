@@ -26,7 +26,7 @@ function toneText(kind: "good" | "warn" | "bad" | "muted"): string {
 }
 
 const REGION_KEY = "tick-latency-region";
-const APP_VERSION = "v0.2.0";
+const APP_VERSION = "v0.3.0";
 
 const MODES = [
   { id: "15", label: "15s", ms: 15_000 },
