@@ -1,4 +1,4 @@
-import { loadRuns, saveRun, type SavedRun } from "./history";
+import { clearRuns, loadRuns, saveRun, type SavedRun } from "./history";
 import { pauseLobby, resumeLobby, startLobby, stopLobby } from "./lobby";
 import { regionUrl, type Region } from "./regions";
 import { measureStun } from "./stun";
@@ -225,6 +225,11 @@ export function startRange(next: Region, durationMs: number) {
     url: regionUrl(next),
     durationMs,
   });
+}
+
+export function clearHistory(): void {
+  clearRuns();
+  publish({ ...snap, runs: [] });
 }
 
 export function stopRange() {

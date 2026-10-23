@@ -7,6 +7,7 @@ import {
   mountEngine,
   startRange,
   stopRange,
+  clearHistory,
   subscribe,
   type Snap,
 } from "./engine";
@@ -159,15 +160,6 @@ export function App() {
     const id = bestId(lobby);
     if (id) setRegionId(id);
   }, [lobby, regionId]);
-
-  useEffect(() => {
-    if (!regionId) return;
-    try {
-      localStorage.setItem(REGION_KEY, regionId);
-    } catch {
-      // Ignore private mode.
-    }
-  }, [regionId]);
 
   const region = REGIONS.find((item) => item.id === regionId) ?? null;
   const best = bestId(lobby);
@@ -356,9 +348,17 @@ export function App() {
                 type="button"
                 class="mx-1 min-h-[3.25rem] flex-1 basis-48 -skew-x-[10deg] cursor-pointer border-0 bg-red text-[1.35rem] font-semibold tracking-[0.16em] text-bg uppercase enabled:hover:bg-[color-mix(in_srgb,var(--color-red)_86%,white)] disabled:cursor-not-allowed disabled:bg-[#7a2a32] disabled:text-paper"
                 disabled={!region}
-                onClick={() => region && startRange(region, duration)}
+                onClick={() => {
+                  if (!region) return;
+                  try {
+                    localStorage.setItem(REGION_KEY, region.id);
+                  } catch {
+                    // Ignore private mode.
+                  }
+                  startRange(region, duration);
+                }}
               >
-                <span class="inline-block skew-x-[10deg]">Start range</span>
+                <span class="inline-block skew-x-[10deg]">Start test</span>
               </button>
             )}
             <div
@@ -382,10 +382,16 @@ export function App() {
           </div>
           {snap.runs.length > 0 && (
             <section>
-              <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">LAST RANGES</p>
-              <p class="m-0 mb-[0.35rem] text-[0.75rem] tracking-[0.03em] text-muted">
-                Every ping is scored by how far it rises above the normal ping. 0.1 ms over is still 100%. A ping at 1.5 times that level is a full spike, and half the pings at that height is 0%.
-              </p>
+              <div class="mb-[0.35rem] flex items-center justify-between gap-3">
+                <p class="m-0 text-[0.72rem] tracking-[0.14em] text-muted">Test History</p>
+                <button
+                  type="button"
+                  class="cursor-pointer border border-line bg-transparent px-2 py-1 text-[0.72rem] tracking-[0.08em] text-muted"
+                  onClick={clearHistory}
+                >
+                  Clear
+                </button>
+              </div>
               <ol class="m-0 flex list-none flex-col gap-[0.2rem] overflow-x-auto p-0">
                 {snap.runs.map((run) => {
                   const stability = typeof run.stability === "number" ? run.stability : null;
@@ -439,6 +445,11 @@ export function App() {
             </p>
             <p class="mb-[0.55rem] max-w-[42rem]">
               A live range is a few megabytes a minute. The screen stays awake while it runs.
+            </p>
+            <p class="mb-0 max-w-[42rem]">
+              Every ping is scored by how far it rises above the normal ping. 0.1 ms over is still
+              100%. A ping at 1.5 times that level is a full spike, and half the pings at that
+              height is 0%.
             </p>
           </section>
         </main>

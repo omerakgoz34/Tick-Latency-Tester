@@ -26,6 +26,14 @@ export function loadRuns(): SavedRun[] {
   }
 }
 
+export function clearRuns(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // Ignore private mode.
+  }
+}
+
 export function saveRun(run: SavedRun): SavedRun[] {
   const next = [run, ...loadRuns()].slice(0, MAX);
   try {
